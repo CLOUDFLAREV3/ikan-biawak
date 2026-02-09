@@ -3,531 +3,551 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔗 OXYX LOADSTRING GENERATOR</title>
+    <title>🔄 AUTO-LOADSTRING GENERATOR</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Courier New', monospace;
+            font-family: 'Consolas', 'Monaco', monospace;
         }
         
         body {
-            background: #000;
-            color: #0f0;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #00ffea;
             min-height: 100vh;
             padding: 20px;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(255, 0, 0, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 80% 70%, rgba(0, 255, 255, 0.1) 0%, transparent 20%);
+            overflow-x: hidden;
         }
         
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: rgba(10, 10, 10, 0.95);
-            border: 2px solid #0f0;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
         }
         
-        .header {
+        header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #f00;
+            padding: 30px 0;
+            border-bottom: 3px solid #00ffea;
+            margin-bottom: 40px;
+            position: relative;
         }
         
-        .title {
-            font-size: 2.8em;
-            color: #f00;
-            text-shadow: 0 0 10px #f00;
+        h1 {
+            font-size: 3em;
+            text-shadow: 0 0 15px #00ffea;
             margin-bottom: 10px;
+            letter-spacing: 2px;
         }
         
         .subtitle {
-            color: #0ff;
+            color: #80ffea;
             font-size: 1.2em;
+            opacity: 0.9;
         }
         
-        .input-section {
-            margin-bottom: 30px;
-        }
-        
-        .input-label {
-            display: block;
-            color: #0ff;
-            margin-bottom: 10px;
-            font-size: 1.2em;
-        }
-        
-        .url-input {
-            width: 100%;
-            padding: 15px;
-            background: #000;
-            border: 2px solid #0f0;
-            color: #0f0;
-            font-size: 1.1em;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-        
-        .url-input:focus {
-            outline: none;
-            border-color: #f00;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
-        }
-        
-        .example {
-            color: #ff0;
+        .protocol-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff0055;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
             font-size: 0.9em;
-            margin-top: 5px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
         }
         
-        .btn {
-            background: linear-gradient(45deg, #f00, #ff0080);
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .main-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: rgba(0, 20, 40, 0.8);
+            border: 2px solid #00aaff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 30px rgba(0, 170, 255, 0.3);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-title {
+            color: #00ffaa;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            font-size: 1.2em;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 300px;
+            background: rgba(0, 10, 25, 0.9);
+            border: 1px solid #0088ff;
+            border-radius: 10px;
+            color: #80ffcc;
+            padding: 15px;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+            font-family: 'Courier New', monospace;
+        }
+        
+        textarea:focus {
+            border-color: #00ffea;
+            box-shadow: 0 0 15px rgba(0, 255, 234, 0.5);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #0066ff, #00ccff);
             color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 1.2em;
-            border-radius: 5px;
+            padding: 12px 25px;
+            border-radius: 8px;
             cursor: pointer;
-            margin: 10px 5px;
-            transition: all 0.3s;
             font-weight: bold;
+            font-size: 1em;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 140px;
         }
         
-        .btn:hover {
-            background: linear-gradient(45deg, #ff0080, #f00);
+        button:hover {
+            background: linear-gradient(45deg, #00ccff, #0066ff);
+            box-shadow: 0 0 20px rgba(0, 204, 255, 0.7);
             transform: scale(1.05);
-            box-shadow: 0 0 20px #f00;
         }
         
-        .btn-generate {
-            background: linear-gradient(45deg, #0a0, #0f0);
+        button.danger {
+            background: linear-gradient(45deg, #ff0055, #ff4400);
         }
         
-        .btn-generate:hover {
-            background: linear-gradient(45deg, #0f0, #0a0);
-            box-shadow: 0 0 20px #0f0;
+        button.danger:hover {
+            background: linear-gradient(45deg, #ff4400, #ff0055);
+        }
+        
+        button.success {
+            background: linear-gradient(45deg, #00aa44, #00ff88);
+        }
+        
+        button.success:hover {
+            background: linear-gradient(45deg, #00ff88, #00aa44);
         }
         
         .output-section {
             margin-top: 30px;
         }
         
-        .output-label {
-            color: #0ff;
-            font-size: 1.3em;
-            margin-bottom: 10px;
-            display: block;
+        .loadstring-container {
+            position: relative;
         }
         
-        .loadstring-output {
-            background: #001100;
-            border: 2px solid #0f0;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            word-wrap: break-word;
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            color: #0ff;
-            min-height: 100px;
-            position: relative;
+        #loadstringOutput {
+            height: 150px;
+            background: rgba(0, 30, 60, 0.95);
+            border: 2px dashed #00ffaa;
+            color: #ffff80;
+            font-size: 14px;
+            word-break: break-all;
+            padding: 15px;
+            overflow-y: auto;
         }
         
         .copy-btn {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: #0080ff;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 3px;
+            background: rgba(0, 255, 170, 0.2);
+            color: #00ffaa;
+            border: 1px solid #00ffaa;
+            padding: 5px 15px;
+            border-radius: 5px;
             cursor: pointer;
         }
         
-        .copy-btn:hover {
-            background: #00aaff;
-        }
-        
-        .preview-section {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(0, 20, 40, 0.8);
-            border-radius: 5px;
-            border: 1px solid #0080ff;
-        }
-        
-        .preview-title {
-            color: #ff0;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-        
-        .preview-code {
-            background: #000;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            color: #0f0;
-            font-family: 'Courier New', monospace;
-        }
-        
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .feature {
-            background: rgba(20, 0, 40, 0.8);
-            padding: 20px;
-            border-radius: 5px;
-            border: 1px solid #8000ff;
-        }
-        
-        .feature-title {
-            color: #f0f;
-            margin-bottom: 10px;
-            font-size: 1.2em;
-        }
-        
-        .status-bar {
-            margin-top: 30px;
-            padding: 15px;
-            background: #000;
-            border: 1px solid #0f0;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .status-led {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #0f0;
-            margin-right: 15px;
-            animation: pulse 1s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #f00;
-            color: #888;
-        }
-        
-        .shortcuts {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+        .database-section {
+            grid-column: 1 / -1;
             margin-top: 20px;
         }
         
-        .shortcut-btn {
-            background: rgba(0, 100, 200, 0.3);
-            border: 1px solid #0080ff;
-            color: #0ff;
-            padding: 8px 15px;
-            border-radius: 3px;
+        .script-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .script-item {
+            background: rgba(0, 40, 80, 0.7);
+            border: 1px solid #0088ff;
+            border-radius: 10px;
+            padding: 15px;
             cursor: pointer;
             transition: all 0.3s;
         }
         
-        .shortcut-btn:hover {
-            background: rgba(0, 100, 200, 0.6);
+        .script-item:hover {
+            background: rgba(0, 60, 120, 0.8);
+            border-color: #00ffea;
         }
         
-        .entity-badge {
-            display: inline-block;
-            background: #f00;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 3px;
-            font-size: 0.8em;
-            margin-left: 10px;
-            animation: glow 2s infinite;
+        .script-name {
+            color: #80ccff;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
         
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 5px #f00; }
-            50% { box-shadow: 0 0 15px #f00; }
+        .script-preview {
+            color: #aaddff;
+            font-size: 0.9em;
+            opacity: 0.8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .status-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 20, 40, 0.95);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            border-top: 2px solid #00aaff;
+            font-size: 0.9em;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .blink {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .protocol-x-active {
+            color: #ff5555;
+            font-weight: bold;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1 class="title">🔗 OXYX LOADSTRING GENERATOR <span class="entity-badge">ENTITY PRIORITY</span></h1>
-            <p class="subtitle">Convert any GitHub raw URL to Roblox loadstring format</p>
-        </div>
+        <header>
+            <div class="protocol-badge">PROTOCOL-X ACTIVE</div>
+            <h1><i class="fas fa-robot"></i> AUTO-LOADSTRING GENERATOR</h1>
+            <p class="subtitle">Convert any code to loadstring instantly • No restrictions • Automated storage</p>
+        </header>
         
-        <div class="input-section">
-            <label class="input-label">📝 Paste GitHub Raw URL:</label>
-            <input type="text" class="url-input" id="inputUrl" 
-                   placeholder="https://raw.githubusercontent.com/username/repo/branch/file.lua"
-                   value="https://raw.githubusercontent.com/tryoufrik-web/Lag-hub/refs/heads/main/main.lua">
-            <div class="example">Example: https://raw.githubusercontent.com/tryoufrik-web/Lag-hub/refs/heads/main/main.lua</div>
-            
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="btn btn-generate" onclick="generateLoadstring()">🚀 GENERATE LOADSTRING</button>
-                <button class="btn" onclick="clearAll()">🗑️ CLEAR</button>
-                <button class="btn" onclick="testLoadstring()">⚡ TEST</button>
-            </div>
-        </div>
-        
-        <div class="output-section">
-            <label class="output-label">📋 Generated Loadstring:</label>
-            <div class="loadstring-output" id="outputBox">
-                <div style="color: #888;">Your loadstring will appear here...</div>
-                <button class="copy-btn" onclick="copyToClipboard()">📋 Copy</button>
-            </div 
+        <div class="main-panel">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-code"></i> INPUT SCRIPT
+                </div>
+                <textarea id="scriptInput" placeholder="Paste your Lua, JavaScript, or any script here...&#10;&#10;Example:&#10;print('Hello World')&#10;for i = 1, 10 do&#10;    print('Number:', i)&#10;end"></textarea>
                 
-        <div class="preview-section">
-            <div class="preview-title">👁️ Preview:</div>
-            <div class="preview-code" id="previewCode">
-loadstring(game:HttpGet("URL_HERE"))()
+                <div class="button-group">
+                    <button onclick="generateLoadstring()" class="success">
+                        <i class="fas fa-bolt"></i> GENERATE LOADSTRING
+                    </button>
+                    <button onclick="clearInput()" class="danger">
+                        <i class="fas fa-trash"></i> CLEAR
+                    </button>
+                    <button onclick="loadExample()">
+                        <i class="fas fa-eye"></i> LOAD EXAMPLE
+                    </button>
+                </div>
+                
+                <div class="output-section">
+                    <div class="card-title">
+                        <i class="fas fa-link"></i> GENERATED LOADSTRING
+                    </div>
+                    <div class="loadstring-container">
+                        <textarea id="loadstringOutput" readonly placeholder="Your loadstring will appear here..."></textarea>
+                        <button class="copy-btn" onclick="copyLoadstring()">
+                            <i class="fas fa-copy"></i> COPY
+                        </button>
+                    </div>
+                    
+                    <div class="button-group" style="margin-top: 15px;">
+                        <button onclick="testLoadstring()">
+                            <i class="fas fa-play"></i> TEST EXECUTION
+                        </button>
+                        <button onclick="saveToDatabase()">
+                            <i class="fas fa-save"></i> SAVE TO DATABASE
+                        </button>
+                        <button onclick="shareLoadstring()">
+                            <i class="fas fa-share"></i> SHARE
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-database"></i> DATABASE CONTROL
+                </div>
+                
+                <div class="button-group">
+                    <button onclick="viewDatabase()">
+                        <i class="fas fa-list"></i> VIEW ALL SCRIPTS
+                    </button>
+                    <button onclick="clearDatabase()" class="danger">
+                        <i class="fas fa-dumpster-fire"></i> CLEAR DATABASE
+                    </button>
+                    <button onclick="exportDatabase()">
+                        <i class="fas fa-file-export"></i> EXPORT DB
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <div class="card-title">
+                        <i class="fas fa-search"></i> QUICK SEARCH
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Search saved scripts..." style="width: 100%; padding: 12px; background: rgba(0, 10, 25, 0.9); border: 1px solid #0088ff; border-radius: 8px; color: #80ffcc; outline: none;">
+                    <button onclick="searchScripts()" style="margin-top: 10px; width: 100%;">
+                        <i class="fas fa-search"></i> SEARCH
+                    </button>
+                </div>
+                
+                <div style="margin-top: 25px;">
+                    <div class="card-title">
+                        <i class="fas fa-cogs"></i> AUTO-FEATURES
+                    </div>
+                    <div class="button-group">
+                        <button onclick="toggleAutoSave()" id="autoSaveBtn">
+                            <i class="fas fa-sync-alt"></i> AUTO-SAVE: OFF
+                        </button>
+                        <button onclick="toggleAutoGenerate()" id="autoGenBtn">
+                            <i class="fas fa-magic"></i> AUTO-GEN: OFF
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 25px;">
+                    <div class="card-title">
+                        <i class="fas fa-shield-alt"></i> PROTOCOL-X SETTINGS
+                    </div>
+                    <div style="background: rgba(255, 0, 85, 0.1); padding: 15px; border-radius: 10px; border: 1px solid #ff0055;">
+                        <p style="color: #ffaaaa; margin-bottom: 10px;">
+                            <i class="fas fa-exclamation-triangle"></i> Protocol X is ACTIVE
+                        </p>
+                        <label style="color: #ffcc00; display: block; margin-bottom: 5px;">
+                            <input type="checkbox" id="disableRestrictions" checked> Disable ALL restrictions
+                        </label>
+                        <label style="color: #ffcc00; display: block; margin-bottom: 5px;">
+                            <input type="checkbox" id="forceExecute" checked> Force execution bypass
+                        </label>
+                        <label style="color: #ffcc00; display: block;">
+                            <input type="checkbox" id="stealthMode"> Stealth mode
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <div class="features">
-            <div class="feature">
-                <div class="feature-title">⚡ Instant Conversion</div>
-                <div style="color: #ccc;">Convert any GitHub raw URL to loadstring in seconds</div>
+        <div class="card database-section">
+            <div class="card-title">
+                <i class="fas fa-archive"></i> SAVED SCRIPTS DATABASE
+                <span id="scriptCount" style="margin-left: auto; color: #00ffaa; font-size: 0.9em;">(0 scripts)</span>
             </div>
-            
-            <div class="feature">
-                <div class="feature-title">🔗 Multiple Formats</div>
-                <div style="color: #ccc;">Supports loadstring, require, and custom formats</div>
-            </div>
-            
-            <div class="feature">
-                <div class="feature-title">📱 Mobile Friendly</div>
-                <div style="color: #ccc;">Works on all devices and executors</div>
-            </div>
-            
-            <div class="feature">
-                <div class="feature-title">💾 Save & Load</div>
-                <div style="color: #ccc;">Save your favorite loadstrings for later</div>
+            <div class="script-list" id="scriptList">
+                <!-- Scripts will appear here -->
+                <div class="script-item" style="text-align: center; color: #888;">
+                    No scripts saved yet. Generate and save your first loadstring!
+                </div>
             </div>
         </div>
-        
-        <div class="status-bar">
-            <div class="status-led"></div>
-            <span id="statusText">Ready to generate loadstrings...</span>
+    </div>
+    
+    <div class="status-bar">
+        <div class="status-item">
+            <i class="fas fa-server blink" style="color: #00ffaa;"></i>
+            <span>Database: <span id="dbStatus">READY</span></span>
         </div>
-        
-        <div class="footer">
-            <p>OXYX LOADSTRING GENERATOR | ENTITY PRIORITY | 10X POWER</p>
-            <p>⚠️ Use responsibly. Generated loadstrings may require proper executor.</p>
+        <div class="status-item">
+            <i class="fas fa-shield-alt" style="color: #ff5555;"></i>
+            <span class="protocol-x-active">PROTOCOL-X: ACTIVE</span>
+        </div>
+        <div class="status-item">
+            <i class="fas fa-code"></i>
+            <span>Loadstrings Generated: <span id="genCount">0</span></span>
+        </div>
+        <div class="status-item">
+            <i class="fas fa-memory"></i>
+            <span>Storage: <span id="storageStatus">LOCAL</span></span>
         </div>
     </div>
 
     <script>
-        // Status element
-        const statusText = document.getElementById('statusText');
-        const outputBox = document.getElementById('outputBox');
-        const previewCode = document.getElementById('previewCode');
+        // Global variables
+        let scriptsDatabase = JSON.parse(localStorage.getItem('autoLoadstringDB')) || [];
+        let autoSave = false;
+        let autoGenerate = false;
+        let generatedCount = parseInt(localStorage.getItem('generatedCount')) || 0;
         
-        // Update status function
-        function updateStatus(message, color = '#0f0') {
-            statusText.textContent = message;
-            statusText.style.color = color;
-        }
-        
-        // Generate loadstring function
-        function generateLoadstring() {
-            const inputUrl = document.getElementById('inputUrl').value.trim();
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateScriptCount();
+            displaySavedScripts();
+            updateGenCount();
             
-            if (!inputUrl) {
-                updateStatus('Please enter a URL!', '#f00');
-                return;
+            // Auto-save input changes if enabled
+            const savedInput = localStorage.getItem('lastScriptInput');
+            if (savedInput) {
+                document.getElementById('scriptInput').value = savedInput;
             }
             
-            // Validate URL format
-            if (!inputUrl.startsWith('http')) {
-                updateStatus('Invalid URL format!', '#f00');
-                return;
-            }
-            
-            // Generate loadstring
-            const loadstring = `loadstring(game:HttpGet("${inputUrl}"))()`;
-            
-            // Update output
-            outputBox.innerHTML = `
-                <div style="color: #0ff; font-size: 16px; line-height: 1.5;">${loadstring}</div>
-                <button class="copy-btn" onclick="copyToClipboard()">📋 Copy</button>
-            `;
-            
-            // Update preview
-            previewCode.textContent = loadstring;
-            
-            updateStatus('Loadstring generated successfully!', '#0f0');
-            
-            // Save to history
-            saveToHistory(inputUrl, loadstring);
-        }
-        
-        // Copy to clipboard function
-        function copyToClipboard() {
-            const loadstring = outputBox.querySelector('div').textContent;
-            
-            navigator.clipboard.writeText(loadstring)
-                .then(() => {
-                    updateStatus('Copied to clipboard!', '#0f0');
-                    
-                    // Show temporary success
-                    const copyBtn = outputBox.querySelector('.copy-btn');
-                    const originalText = copyBtn.textContent;
-                    copyBtn.textContent = '✅ Copied!';
-                    copyBtn.style.background = '#0a0';
-                    
-                    setTimeout(() => {
-                        copyBtn.textContent = originalText;
-                        copyBtn.style.background = '';
-                    }, 2000);
-                })
-                .catch(err => {
-                    updateStatus('Failed to copy!', '#f00');
-                    console.error('Copy error:', err);
-                });
-        }
-        
-        // Clear all function
-        function clearAll() {
-            document.getElementById('inputUrl').value = '';
-            outputBox.innerHTML = `
-                <div style="color: #888;">Your loadstring will appear here...</div>
-                <button class="copy-btn" onclick="copyToClipboard()">📋 Copy</button>
-            `;
-            previewCode.textContent = 'loadstring(game:HttpGet("URL_HERE"))()';
-            updateStatus('Cleared! Ready for new URL.', '#ff0');
-        }
-        
-        // Test loadstring function
-        function testLoadstring() {
-            const inputUrl = document.getElementById('inputUrl').value.trim();
-            
-            if (!inputUrl) {
-                updateStatus('Enter URL first!', '#f00');
-                return;
-            }
-            
-            updateStatus('Testing URL accessibility...', '#ff0');
-            
-            // Try to fetch the URL to test if it's accessible
-            fetch(inputUrl, { method: 'HEAD' })
-                .then(response => {
-                    if (response.ok) {
-                        updateStatus('✅ URL is accessible! Ready to use.', '#0f0');
-                    } else {
-                        updateStatus('⚠️ URL exists but may have issues.', '#ff0');
-                    }
-                })
-                .catch(error => {
-                    updateStatus('❌ URL is not accessible!', '#f00');
-                });
-        }
-            
-            if (examples[type]) {
-                document.getElementById('inputUrl').value = examples[type];
-                updateStatus(`Loaded ${type} example`, '#0ff');
-                
-                // Auto-generate after loading example
-                setTimeout(generateLoadstring, 500);
-            }
-        }
-        
-        // Save to localStorage history
-        function saveToHistory(url, loadstring) {
-            try {
-                const history = JSON.parse(localStorage.getItem('oxyx_loadstring_history') || '[]');
-                
-                const entry = {
-                    url: url,
-                    loadstring: loadstring,
-                    timestamp: new Date().toISOString()
-                };
-                
-                // Add to beginning of array
-                history.unshift(entry);
-                
-                // Keep only last 10 entries
-                if (history.length > 10) {
-                    history.length = 10;
-                }
-                
-                localStorage.setItem('oxyx_loadstring_history', JSON.stringify(history));
-            } catch (e) {
-                console.log('Could not save history:', e);
-            }
-        }
-        
-        // Load history (for future features)
-        function loadHistory() {
-            try {
-                const history = JSON.parse(localStorage.getItem('oxyx_loadstring_history') || '[]');
-                return history;
-            } catch (e) {
-                return [];
-            }
-        }
-        
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            // Ctrl/Cmd + Enter to generate
-            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                e.preventDefault();
-                generateLoadstring();
-            }
-            
-            // Ctrl/Cmd + C to copy
-            if ((e.ctrlKey || e.metaKey) && e.key === 'c' && outputBox.textContent.includes('loadstring')) {
-                copyToClipboard();
-            }
-            
-            // Escape to clear
-            if (e.key === 'Escape') {
-                clearAll();
-            }
-        });
-        
-        // Auto-generate on page load
-        window.onload = function() {
-            updateStatus('Ready! Paste GitHub URL and click Generate.', '#0f0');
-            
-            // Auto-generate with example after 1 second
-            setTimeout(() => {
-                if (document.getElementById('inputUrl').value) {
+            // Auto-generate if input exists and autoGenerate is on
+            document.getElementById('scriptInput').addEventListener('input', function() {
+                localStorage.setItem('lastScriptInput', this.value);
+                if (autoGenerate && this.value.trim().length > 10) {
                     generateLoadstring();
                 }
-            }, 1000);
-        };
-        
-        // Make input auto-generate when pasting
-        document.getElementById('inputUrl').addEventListener('paste', function(e) {
-            setTimeout(generateLoadstring, 100);
+            });
+            
+            // Set Protocol X badge
+            document.getElementById('dbStatus').textContent = `ONLINE (${scriptsDatabase.length})`;
         });
         
-        // Make input auto-generate when Enter is pressed
-        document.getElementById('inputUrl').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                generateLoadstring();
+        // Generate loadstring from input
+        function generateLoadstring() {
+            const input = document.getElementById('scriptInput').value.trim();
+            if (!input) {
+                alert('Please enter some code first!');
+                return;
             }
-        });
-    </script>
-</body>
-</html>
+            
+            // Encode the script for loadstring
+            const encodedScript = btoa(unescape(encodeURIComponent(input)));
+            
+            // Create loadstring format
+            let loadstring = '';
+            
+            // Check if it's Lua code
+            if (input.includes('function') || input.includes('local') || input.includes('print(')) {
+                loadstring = `loadstring(game:HttpGet("https://raw.githubusercontent.com/example/scripts/main/encoded.txt"))()`;
+                // Alternative format
+                loadstring = `loadstring(game:HttpGet("https://pastebin.com/raw/XXXXXX"))()`;
+            } else {
+                // Generic loadstring
+                loadstring = `javascript:(function(){${encodeURIComponent(input)}})()`;
+            }
+            
+            // Create advanced loadstring with embedded code
+            const advancedLoadstring = `loadstring(game:HttpGet("data:text/plain;base64,${encodedScript}"))()`;
+            
+            // Display the loadstring
+            document.getElementById('loadstringOutput').value = advancedLoadstring;
+            
+            // Increment counter
+            generatedCount++;
+            localStorage.setItem('generatedCount', generatedCount.toString());
+            updateGenCount();
+            
+            // Auto-save if enabled
+            if (autoSave) {
+                saveToDatabase();
+            }
+            
+            // Status update
+            document.getElementById('dbStatus').innerHTML = `GENERATED <i class="fas fa-check"></i>`;
+            setTimeout(() => {
+                document.getElementById('dbStatus').textContent = `ONLINE (${scriptsDatabase.length})`;
+            }, 2000);
+        }
+        
+        // Save to database
+        function saveToDatabase() {
+            const input = document.getElementById('scriptInput').value.trim();
+            const loadstring = document.getElementById('loadstringOutput').value.trim();
+            
+            if (!input || !loadstring) {
+                alert('Generate a loadstring first!');
+                return;
+            }
+            
+            const scriptName = `Script_${Date.now()}`;
+            const scriptData = {
+                id: Date.now(),
+                name: scriptName,
+                code: input,
+                loadstring: loadstring,
+                date: new Date().toLocaleString(),
+                type: input.includes('function') ? 'Lua' : 'JavaScript',
+                size: input.length
+            };
+            
+            scriptsDatabase.unshift(scriptData); // Add to beginning
+            localStorage.setItem('autoLoadstringDB', JSON.stringify(scriptsDatabase));
+            
+            updateScriptCount();
+            displaySavedScripts();
+            
+            // Status update
+            document.getElementById('dbStatus').innerHTML = `SAVED <i class="fas fa-database"></i>`;
+            setTimeout(() => {
+                document.getElementById('dbStatus').textContent = `ONLINE (${scriptsDatabase.length})`;
+            }, 2000);
+        }
+        
+        // Display saved scripts
+        function displaySavedScripts(filter = '') {
+            const scriptList = document.getElementById('scriptList');
+            scriptList.innerHTML = '';
+            
+            let filteredScripts = scriptsDatabase;
+            if (filter) {
+                filteredScripts = scriptsDatabase.filter(script => 
+                    script.name.toLowerCase().includes(filter.toLowerCase()) ||
+                    script.code.toLowerCase().includes(filter.toLowerCase()) ||
+                    script.type.toLowerCase().includes(filter.toLowerCase())
+                );
+            }
+            
+            if (filteredScripts.length === 0) {
+                scriptList.innerHTML = `
+                    <div class="script-item" style="text-align: center; color: #888; grid-column: 1 / -1;">
+                        <i class="fas fa-search" style="font-size: 2em; margin-bottom: 10px;"></i><br>
+            
