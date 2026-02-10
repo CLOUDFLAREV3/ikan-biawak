@@ -12,10 +12,12 @@
         textarea, input { width: 100%; background: #000; color: #0f0; border: 1px solid #333; padding: 8px; font-size: 11px; }
         button { background: #003300; color: #0f0; border: 1px solid #00aa00; padding: 8px; cursor: pointer; width: 100%; margin: 5px 0; }
         button:hover { background: #005500; }
-        .loadstring { background: #001100; padding: 8px; margin: 5px 0; word-break: break-all; font-size: 10px; }
+        .loadstring { background: #001100; padding: 8px; margin: 5px 0; word-break: break-all; font-size: 10px; cursor: pointer; }
+        .loadstring:hover { background: #002200; }
         .info { color: #888; font-size: 10px; margin-top: 5px; }
         .warning { color: #ff0; }
         .error { color: #f00; }
+        .copy-success { background: #002200 !important; border: 1px solid #0f0 !important; }
     </style>
 </head>
 <body>
@@ -35,10 +37,11 @@
         </div>
         
         <div class="box">
-            <b>3. HASIL LOADSTRING (Auto-copy):</b>
-            <div class="loadstring" id="result"></div>
-            <div class="info">Length: <span id="length">0</span> chars | Github-safe: <span id="safe">✓</span></div>
+            <b>3. HASIL LOADSTRING (Klik untuk copy):</b>
+            <div class="loadstring" id="result" onclick="copyResult()">Hasil akan muncul di sini...</div>
+            <div class="info">Length: <span id="length">0</span> chars | Status: <span id="status">Menunggu...</span></div>
             <button onclick="testLoadstring()" style="background:#000055;">🔧 TEST LOADSTRING</button>
+            <button onclick="copyResult()" style="background:#330033;">📋 COPY HASIL</button>
         </div>
         
         <div class="box">
@@ -51,17 +54,17 @@
         <div class="box warning">
             <b>⚠ NOTE:</b>
             <div class="info">• Raw URL langsung jadi loadstring tanpa download</div>
+            <div class="info">• Klik hasil loadstring untuk copy</div>
             <div class="info">• Semua eksekusi tanggung jawab pengguna</div>
         </div>
     </div>
 
 <script>
-// Simpan history di localStorage
-let history = JSON.parse(localStorage.getItem('gh_loadstring_history')) || [];
+let currentLoadstring = "";
 
 function convertUrl() {
     const url = document.getElementById('githubUrl').value.trim();
-    if (!url) return alert('Masukkan URL!');
+    if (!url) return showError('Masukkan URL!');
     
     // Cek apakah sudah raw github
     let loadstring = '';
@@ -82,12 +85,11 @@ function convertUrl() {
     }
     
     showResult(loadstring);
-    saveToHistory(url, loadstring);
 }
 
 function convertCode() {
     const code = document.getElementById('directCode').value.trim();
-    if (!code) return alert('Masukkan code!');
+    if (!code) return showError('Masukkan code!');
     
     const minify = document.getElementById('minify').checked;
     const useBase64 = document.getElementById('base64').checked;
@@ -113,59 +115,89 @@ function convertCode() {
     }
     
     showResult(loadstring);
-    saveToHistory('direct_code', loadstring);
 }
 
 function showResult(loadstring) {
     const resultDiv = document.getElementById('result');
     const lengthSpan = document.getElementById('length');
-    const safeSpan = document.getElementById('safe');
+    const statusSpan = document.getElementById('status');
     
+    currentLoadstring = loadstring;
     resultDiv.textContent = loadstring;
     lengthSpan.textContent = loadstring.length;
-    safeSpan.textContent = loadstring.length <= 450 ? '✓' : '✗ (terlalu panjang)';
     
-    // Auto-copy ke clipboard
-    navigator.clipboard.writeText(loadstring).then(() => {
-        resultDiv.style.border = '1px solid #0f0';
-        setTimeout(() => resultDiv.style.border = 'none', 1000);
+    // Update status
+    if (loadstring.length <= 450) {
+        statusSpan.innerHTML = '<span style="color:#0f0">✓ GitHub-safe</span>';
+    } else {
+        statusSpan.innerHTML = '<span style="color:#ff0">⚠ Mungkin terlalu panjang</span>';
+    }
+    
+    // Hanya tampilkan, tidak auto-copy
+    resultDiv.style.border = "1px solid #333";
+}
+
+function copyResult() {
+    if (!currentLoadstring) return showError('Belum ada loadstring!');
+    
+    navigator.clipboard.writeText(currentLoadstring).then(() => {
+        const resultDiv = document.getElementById('result');
+        const statusSpan = document.getElementById('status');
+        
+        resultDiv.classList.add('copy-success');
+        statusSpan.innerHTML = '<span style="color:#0f0">✓ Tersalin ke clipboard!</span>';
+        
+        setTimeout(() => {
+            resultDiv.classList.remove('copy-success');
+            if (currentLoadstring.length <= 450) {
+                statusSpan.innerHTML = '<span style="color:#0f0">✓ GitHub-safe</span>';
+            } else {
+                statusSpan.innerHTML = '<span style="color:#ff0">⚠ Mungkin terlalu panjang</span>';
+            }
+        }, 1500);
     });
 }
 
 function testLoadstring() {
-    const loadstring = document.getElementById('result').textContent;
-    if (!loadstring) return alert('Generate dulu!');
+    if (!currentLoadstring) return showError('Generate dulu!');
     
+    // Copy dulu
+    copyResult();
+    
+    // Buka test window
     const testWin = window.open('', '_blank');
     testWin.document.write(`
         <html><body style="background:#000;color:#0f0;font-family:monospace;padding:20px;">
         <h3>Loadstring Test:</h3>
-        <div style="background:#111;padding:10px;margin:10px 0;">
-        ${loadstring}
+        <div style="background:#111;padding:10px;margin:10px 0;word-break:break-all;">
+        ${currentLoadstring}
         </div>
-        <div style="color:#ff0;">Simulasi: loadstring berhasil digenerate</div>
+        <div style="color:#0f0;">✓ Loadstring sudah dicopy ke clipboard</div>
+        <div style="color:#ff0;margin-top:10px;">Paste loadstring di executor untuk test</div>
         </body></html>
     `);
 }
 
-function saveToHistory(source, loadstring) {
-    history.unshift({
-        source: source.length > 50 ? source.substring(0,50)+'...' : source,
-        loadstring: loadstring,
-        time: new Date().toLocaleTimeString(),
-        length: loadstring.length
-    });
-    
-    if (history.length > 10) history = history.slice(0,10);
-    localStorage.setItem('gh_loadstring_history', JSON.stringify(history));
+function showError(message) {
+    const statusSpan = document.getElementById('status');
+    statusSpan.innerHTML = `<span style="color:#f00">✗ ${message}</span>`;
+    setTimeout(() => {
+        statusSpan.innerHTML = '<span style="color:#888">Menunggu...</span>';
+    }, 2000);
 }
+
+// Auto-convert saat URL diubah (opsional)
+document.getElementById('githubUrl').addEventListener('change', convertUrl);
+document.getElementById('githubUrl').addEventListener('paste', function() {
+    setTimeout(convertUrl, 100);
+});
 
 // Load contoh URL
 document.getElementById('githubUrl').value = 'https://raw.githubusercontent.com/lore/Ugomb/refs/heads/main/Test1.Lua';
 
 // Auto-convert saat halaman load
 window.onload = function() {
-    setTimeout(convertUrl, 500);
+    setTimeout(convertUrl, 300);
 };
 </script>
 </body>
