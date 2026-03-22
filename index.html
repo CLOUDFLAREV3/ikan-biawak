@@ -358,41 +358,6 @@
             el.className = len > MAX_LEN * 0.85 ? 'warn' : '';
         }
 
-        /* ============================================================
-           VALIDASI URL
-           Return: { ok: bool, type: 'error'|'warn'|'success', msg: string }
-        ============================================================ */
-        function validateUrl(url) {
-            if (!url) return { ok: false, type: 'error', msg: 'URL tidak boleh kosong!' };
-
-            if (url.length > MAX_LEN)
-                return { ok: false, type: 'error', msg: 'URL terlalu panjang (maks ' + MAX_LEN + ' karakter).' };
-
-            // Harus diawali https
-            if (!url.startsWith('https://'))
-                return { ok: false, type: 'error', msg: 'URL harus menggunakan HTTPS (diawali https://).' };
-
-            // Cek apakah URL valid secara sintaks
-            let parsed;
-            try { parsed = new URL(url); }
-            catch { return { ok: false, type: 'error', msg: 'Format URL tidak valid. Periksa kembali.' }; }
-
-            // Deteksi github.com blob tapi bukan raw — tawarkan perbaikan
-            if (parsed.hostname === 'github.com' && !parsed.pathname.includes('/blob/'))
-                return { ok: false, type: 'error', msg: 'URL GitHub harus mengandung /blob/ (contoh: github.com/user/repo/blob/main/file.lua).' };
-
-            // Cocokkan dengan pola yang diizinkan
-            const match = VALID_PATTERNS.some(p => p.re.test(url));
-            if (!match)
-                return { ok: false, type: 'error', msg: 'URL harus dari raw.githubusercontent.com, raw.github.com, atau github.com (/blob/).' };
-
-            // Ekstensi file disarankan .lua / .txt
-            const pathname = parsed.pathname.toLowerCase();
-            if (!pathname.endsWith('.lua') && !pathname.endsWith('.txt') && !pathname.endsWith('.luau'))
-                return { ok: true,  type: 'warn',  msg: 'Peringatan: Ekstensi file bukan .lua/.luau/.txt. Pastikan ini file Luau yang benar.' };
-
-            return { ok: true, type: 'success', msg: 'URL valid ✔' };
-        }
 
         /* ============================================================
            GENERATE
