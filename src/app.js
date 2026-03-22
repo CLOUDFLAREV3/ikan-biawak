@@ -1,200 +1,179 @@
+/* ================================================================
+   Gene v1.2 — src/app.js
+   Web loadstring generator — standalone, tidak ada hubungan
+   dengan project obfuscator.
+   File ini di-obfuscate saat build → public/app.js
+================================================================ */
 ;(function () {
     'use strict';
 
-    /* ----------------------------------------------------------------
-       DOMAIN LOCK
-       Ganti ALLOWED_HOSTS dengan domain Vercel kamu.
-       Bisa lebih dari satu (misal preview + production).
-       Kalau hostname tidak cocok → semua fungsi tidak didaftarkan
-       ke window, onclick di HTML tidak akan menemukan fungsi apapun.
-    ---------------------------------------------------------------- */
-    var ALLOWED_HOSTS = [
-        'heaxon.vercel.app',          
-        'localhost',                     
-        '127.0.0.1',                    
+    /* ---- DOMAIN LOCK ------------------------------------------- */
+    var ALLOWED = [
+        'heaxon.vercel.app',  // ← ganti dengan domain Vercel kamu
+        'localhost',
+        '127.0.0.1',
     ];
-
-    var _host = (window.location.hostname || '').toLowerCase();
-    var _ok   = false;
-    for (var _i = 0; _i < ALLOWED_HOSTS.length; _i++) {
-        if (_host === ALLOWED_HOSTS[_i] || _host.endsWith('.' + ALLOWED_HOSTS[_i])) {
-            _ok = true;
-            break;
+    var host = (window.location.hostname || '').toLowerCase();
+    var pass = false;
+    for (var i = 0; i < ALLOWED.length; i++) {
+        if (host === ALLOWED[i] || host.endsWith('.' + ALLOWED[i])) {
+            pass = true; break;
         }
     }
+    if (!pass) return; // domain tidak diizinkan → semua fungsi mati
 
-    // Kalau bukan domain yang diizinkan → diam saja, tidak expose fungsi apapun
-    if (!_ok) return;
+    /* ---- CONSTANTS --------------------------------------------- */
+    var MAX = 500;
 
-    /* ----------------------------------------------------------------
-       SETELAH LULUS DOMAIN CHECK — semua logic di dalam IIFE ini
-       tidak bisa diakses dari luar scope ini.
-       Fungsi yang perlu dipanggil dari HTML di-expose lewat window.
-    ---------------------------------------------------------------- */
-
-    var MAX_LEN = 500;
-
-    /* ---- VALIDATE URL ------------------------------------------- */
-    function _validateUrl(url) {
-        if (!url)               return { ok: false, type: 'error', msg: 'URL tidak boleh kosong.' };
-        if (url.length > MAX_LEN) return { ok: false, type: 'error', msg: 'URL terlalu panjang (maks ' + MAX_LEN + ' karakter).' };
-        if (!url.startsWith('https://')) return { ok: false, type: 'error', msg: 'URL harus diawali dengan https://' };
-        return { ok: true, type: 'success', msg: 'URL valid \u2714' };
+    /* ---- VALIDATE ---------------------------------------------- */
+    function _val(url) {
+        if (!url)             return { ok:false, t:'error', m:'URL tidak boleh kosong.' };
+        if (url.length > MAX) return { ok:false, t:'error', m:'URL terlalu panjang (maks '+MAX+' karakter).' };
+        if (!url.startsWith('https://')) return { ok:false, t:'error', m:'URL harus diawali https://' };
+        return { ok:true, t:'success', m:'URL valid \u2714' };
     }
 
-    /* ---- FEEDBACK ------------------------------------------------ */
-    function _setFeedback(type, message) {
+    /* ---- FEEDBACK ---------------------------------------------- */
+    function _fb(type, msg) {
         var box  = document.getElementById('feedbackMsg');
-        var icon = document.getElementById('feedbackIcon');
-        var text = document.getElementById('feedbackText');
-        var inp  = document.getElementById('githubUrl');
-        box.classList.remove('error', 'warn', 'success', 'show');
-        inp.classList.remove('state-error', 'state-warn', 'state-success');
+        var icon = document.getElementById('fbIcon');
+        var text = document.getElementById('fbText');
+        var inp  = document.getElementById('urlInput');
+        box.classList.remove('error','warn','success','show');
+        inp.classList.remove('state-error','state-warn','state-success');
         if (!type) return;
-        var icons = { error: '\u2716', warn: '\u26a0', success: '\u2714' };
-        icon.textContent = icons[type] || '';
-        text.textContent = message;
+        icon.textContent = { error:'\u2716', warn:'\u26a0', success:'\u2714' }[type] || '';
+        text.textContent = msg;
         box.classList.add(type, 'show');
         inp.classList.add('state-' + type);
     }
+    function _clearFb() { _fb(null, ''); }
 
-    function _clearFeedback() { _setFeedback(null, ''); }
-
-    /* ---- URL PREVIEW -------------------------------------------- */
-    function _setUrlPreview(url) {
+    /* ---- URL PREVIEW ------------------------------------------- */
+    function _prev(url) {
         var el = document.getElementById('urlPreview');
-        if (!url) { el.classList.remove('show'); el.innerHTML = ''; return; }
+        if (!url) { el.classList.remove('show'); el.innerHTML=''; return; }
         try {
-            var u    = new URL(url);
-            var path = u.pathname.length > 60 ? u.pathname.substring(0, 60) + '\u2026' : u.pathname;
-            el.innerHTML = '\uD83D\uDD17 Host: <span>' + u.hostname + '</span>'
-                         + (u.pathname && u.pathname !== '/' ? ' \xB7 Path: <span>' + path + '</span>' : '');
+            var u = new URL(url);
+            var p = u.pathname.length > 55
+                ? u.pathname.substring(0, 55) + '\u2026'
+                : u.pathname;
+            el.innerHTML = '\uD83D\uDD17 <span>' + u.hostname + '</span>'
+                + (p && p !== '/' ? ' / <span>' + p + '</span>' : '');
             el.classList.add('show');
         } catch (e) { el.classList.remove('show'); }
     }
 
-    /* ---- TOAST -------------------------------------------------- */
-    var _toastTimer;
-    function _showToast(message, type, duration) {
-        type     = type     || 'success';
-        duration = duration || 2000;
+    /* ---- TOAST ------------------------------------------------- */
+    var _tt;
+    function _toast(msg, type, dur) {
+        type = type || 'success'; dur = dur || 2000;
         var t = document.getElementById('toast');
-        clearTimeout(_toastTimer);
-        t.textContent = message;
-        t.className   = type === 'error' ? 'toast-error' : '';
+        clearTimeout(_tt);
+        t.textContent = msg;
+        t.className   = type === 'error' ? 't-err' : '';
         void t.offsetWidth;
         t.classList.add('show');
-        _toastTimer = setTimeout(function () { t.classList.remove('show'); }, duration);
+        _tt = setTimeout(function () { t.classList.remove('show'); }, dur);
     }
 
-    /* ---- CHAR COUNTER ------------------------------------------- */
-    function _updateCharCount(len) {
+    /* ---- CHAR COUNT -------------------------------------------- */
+    function _cnt(len) {
         var el = document.getElementById('charCount');
-        el.textContent = len + ' / ' + MAX_LEN;
-        el.className   = len > MAX_LEN * 0.85 ? 'warn' : '';
+        el.textContent = len + ' / ' + MAX;
+        el.className   = len > MAX * 0.85 ? 'warn' : '';
     }
 
-    /* ---- GENERATE ----------------------------------------------- */
-    function _generate() {
-        var url    = document.getElementById('githubUrl').value.trim();
-        var output = document.getElementById('output');
-        var result = _validateUrl(url);
-        _setFeedback(result.type, result.msg);
-        _setUrlPreview(result.ok ? url : null);
-        if (!result.ok) { output.value = ''; return; }
-        output.value = 'loadstring(game:HttpGet("' + url + '"))()';
-        _showToast('\u2714 Loadstring berhasil dibuat!', 'success');
+    /* ---- GENERATE ---------------------------------------------- */
+    function _gen() {
+        var url = document.getElementById('urlInput').value.trim();
+        var out = document.getElementById('output');
+        var res = _val(url);
+        _fb(res.t, res.m);
+        _prev(res.ok ? url : null);
+        if (!res.ok) { out.value = ''; return; }
+        out.value = 'loadstring(game:HttpGet("' + url + '"))()';
+        _toast('\u2714 Loadstring dibuat!');
     }
 
-    /* ---- COPY KE CLIPBOARD ------------------------------------- */
-    function _copyToClipboard() {
-        var output = document.getElementById('output');
-        var btn    = document.getElementById('copyBtn');
-
-        if (!output.value) {
-            _setFeedback('error', 'Tidak ada kode untuk disalin! Klik Generate terlebih dahulu.');
-            _showToast('\u2716 Tidak ada kode!', 'error');
+    /* ---- COPY -------------------------------------------------- */
+    function _copy() {
+        var out = document.getElementById('output');
+        var btn = document.getElementById('copyBtn');
+        if (!out.value) {
+            _fb('error', 'Tidak ada kode! Klik GEN terlebih dahulu.');
+            _toast('\u2716 Tidak ada kode!', 'error');
             btn.classList.add('copy-error');
             setTimeout(function () { btn.classList.remove('copy-error'); }, 1500);
             return;
         }
-
-        function onSuccess() {
-            btn.textContent = '\u2713 Copied!';
+        function win() {
+            btn.textContent = '\u2713 COPIED!';
             btn.classList.add('copied');
-            _showToast('\u2714 Berhasil disalin!', 'success');
+            _toast('\u2714 Disalin ke clipboard!');
             setTimeout(function () {
-                btn.textContent = '\uD83D\uDCCB Copy ke Clipboard';
+                btn.textContent = '\u29c9 \u00a0COPY TO CLIPBOARD';
                 btn.classList.remove('copied');
             }, 1800);
         }
-
-        function onFail(err) {
-            _setFeedback('error', 'Gagal menyalin! Coba salin manual dari kotak output.');
-            _showToast('\u2716 Gagal menyalin!', 'error', 3000);
+        function fail(e) {
+            _fb('error', 'Gagal menyalin. Salin manual dari kotak output.');
+            _toast('\u2716 Gagal menyalin!', 'error', 3000);
             btn.classList.add('copy-error');
             setTimeout(function () {
-                btn.textContent = '\uD83D\uDCCB Copy ke Clipboard';
+                btn.textContent = '\u29c9 \u00a0COPY TO CLIPBOARD';
                 btn.classList.remove('copy-error');
             }, 1800);
-            console.error('[LoadGene] Clipboard error:', err);
+            console.error('[Gene]', e);
         }
-
         if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(output.value).then(onSuccess).catch(onFail);
+            navigator.clipboard.writeText(out.value).then(win).catch(fail);
         } else {
             try {
-                output.select();
-                output.setSelectionRange(0, 99999);
+                out.select();
+                out.setSelectionRange(0, 99999);
                 document.execCommand('copy');
-                onSuccess();
-            } catch (e) { onFail(e); }
+                win();
+            } catch (e) { fail(e); }
         }
     }
 
-    /* ---- CLEAR ALL --------------------------------------------- */
-    function _clearAll() {
-        document.getElementById('githubUrl').value = '';
-        document.getElementById('output').value    = '';
-        _clearFeedback();
-        _setUrlPreview(null);
-        _updateCharCount(0);
-        _showToast('\uD83D\uDDD1 Dibersihkan', 'success', 1200);
+    /* ---- CLEAR ------------------------------------------------- */
+    function _clr() {
+        document.getElementById('urlInput').value = '';
+        document.getElementById('output').value   = '';
+        _clearFb();
+        _prev(null);
+        _cnt(0);
+        _toast('\uD83D\uDDD1 Dibersihkan', 'success', 1200);
     }
 
-    /* ---- EVENT LISTENERS --------------------------------------- */
+    /* ---- EVENTS ------------------------------------------------ */
     document.addEventListener('DOMContentLoaded', function () {
-        var inputEl = document.getElementById('githubUrl');
-
-        inputEl.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') { e.preventDefault(); _generate(); }
+        var el = document.getElementById('urlInput');
+        el.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); _gen(); }
         });
-        inputEl.addEventListener('input', function () {
-            _clearFeedback();
-            _setUrlPreview(null);
-            _updateCharCount(this.value.length);
+        el.addEventListener('input', function () {
+            _clearFb(); _prev(null); _cnt(this.value.length);
         });
-        inputEl.addEventListener('paste', function () {
-            var self = this;
+        el.addEventListener('paste', function () {
+            var s = this;
             setTimeout(function () {
-                var v = self.value.trim();
-                _updateCharCount(v.length);
+                var v = s.value.trim();
+                _cnt(v.length);
                 if (v.length > 8) {
-                    var r = _validateUrl(v);
-                    _setFeedback(r.type, r.msg);
-                    if (r.ok) _setUrlPreview(v);
+                    var r = _val(v);
+                    _fb(r.t, r.m);
+                    if (r.ok) _prev(v);
                 }
             }, 50);
         });
     });
 
-    /* ----------------------------------------------------------------
-       EXPOSE ke window — hanya nama ini yang dipanggil dari HTML onclick.
-       Semua nama internal (_generate dll) tidak bisa diakses dari luar.
-    ---------------------------------------------------------------- */
-    window.generate         = _generate;
-    window.copyToClipboard  = _copyToClipboard;
-    window.clearAll         = _clearAll;
+    /* ---- EXPOSE ke window (dipanggil HTML onclick) ------------- */
+    window.generate        = _gen;
+    window.copyToClipboard = _copy;
+    window.clearAll        = _clr;
 
-})(); // ← akhir IIFE, tidak ada yang bocor ke global scope
-                                           
+})();
